@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; manifest-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Screen Eyedropper — Pick Any Colour From Your Screen, HEX RGB HSL OKLCH | S3eidat Tools</title>
+<meta name="description" content="Pick any pixel colour from your screen or a screenshot. Get HEX, RGB, HSL and OKLCH with one-click copy, keep a palette and export it as CSS or JSON. Free and private.">
+<meta property="og:title" content="Screen Eyedropper — pick any colour on screen">
+<meta property="og:description" content="Pick colours from your screen or a screenshot, copy HEX/RGB/HSL/OKLCH, keep a palette. Runs 100% in your browser.">
+<link rel="icon" href="kit/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit/kit.css">
+<link rel="stylesheet" href="app.css">
+<script src="kit/kit.js"></script>
+<!--s3:seo-->
+<link rel="canonical" href="https://s3eidat.github.io/screen-eyedropper/">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0d0f12">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="S3eidat Tools">
+<meta property="og:url" content="https://s3eidat.github.io/screen-eyedropper/">
+<meta property="og:image" content="https://s3eidat.github.io/screen-eyedropper/screenshot.png">
+<meta property="og:image:width" content="1280"><meta property="og:image:height" content="800">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Screen Eyedropper — Pick any colour from your screen">
+<meta name="twitter:description" content="Pick any colour from your screen. Free, private and runs 100% in your browser: no sign-up, no uploads.">
+<meta name="twitter:image" content="https://s3eidat.github.io/screen-eyedropper/screenshot.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Screen Eyedropper", "url": "https://s3eidat.github.io/screen-eyedropper/", "description": "Pick any colour from your screen. Free, private and runs 100% in your browser: no sign-up, no uploads.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any (web browser)", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "image": "https://s3eidat.github.io/screen-eyedropper/screenshot.png", "author": {"@type": "Person", "name": "s3eidat", "url": "https://github.com/s3eidat"}}</script>
+<!--/s3:seo-->
+</head>
+<body data-tool="screen-eyedropper">
+<main class="s3-main">
+  <section class="s3-hero">
+    <h1>Screen Eyedropper</h1>
+    <p>Pick any colour you can see on your screen, in any app or window, and get it as HEX, RGB, HSL or OKLCH. Every pick is saved to a palette you can export. Nothing leaves your device.</p>
+  </section>
+
+  <section class="card ed-main">
+    <div class="ed-left stack">
+      <div class="ed-swatch" id="swatch"><span id="swHex">#14B8A6</span></div>
+      <button class="btn primary big" id="pick">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"/></svg>
+        Pick from screen
+      </button>
+      <p class="faint ed-note" id="support"></p>
+      <label class="field">Or type a colour
+        <input class="input mono" id="manual" placeholder="#1e90ff, rgb(30 144 255), hsl(210 100% 56%)" spellcheck="false" autocomplete="off">
+      </label>
+    </div>
+    <div class="ed-right stack">
+      <div class="ed-formats" id="formats"></div>
+      <div class="ed-contrast" id="contrast"></div>
+    </div>
+  </section>
+
+  <section class="card stack mt" id="fallback">
+    <div class="row between">
+      <h2>Pick from a screenshot <small id="fbSub">paste, drop or open an image, then click a pixel</small></h2>
+      <div class="row">
+        <button class="btn ghost small" id="fbOpen"><svg class="i"><use href="#i-upload"/></svg>Open image</button>
+        <button class="btn ghost small" id="fbClear" hidden><svg class="i"><use href="#i-x"/></svg>Close</button>
+      </div>
+    </div>
+    <label class="drop" id="fbDrop">
+      <input type="file" hidden>
+      <svg class="i"><use href="#i-image"/></svg>
+      <b>Paste a screenshot (<kbd>Ctrl</kbd>+<kbd>V</kbd>) or drop an image</b>
+      <span>Tip: <kbd>PrtSc</kbd> or <kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> on Windows, <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>4</kbd> then Ctrl on Mac</span>
+    </label>
+    <div class="ed-canvas-wrap" id="fbWrap" hidden>
+      <canvas id="fbCanvas" tabindex="0" aria-label="Screenshot: move with the mouse or arrow keys, click or press Enter to pick a colour"></canvas>
+      <canvas class="ed-loupe" id="loupe" width="154" height="154" aria-hidden="true"></canvas>
+    </div>
+    <p class="faint ed-note" id="fbInfo" hidden></p>
+  </section>
+
+  <section class="card stack mt">
+    <div class="row between">
+      <h2>Palette <small id="palCount"></small></h2>
+      <div class="row">
+        <button class="btn small" id="copyCss"><svg class="i"><use href="#i-copy"/></svg>Copy CSS</button>
+        <button class="btn small" id="dlCss"><svg class="i"><use href="#i-download"/></svg>.css</button>
+        <button class="btn small" id="dlJson"><svg class="i"><use href="#i-download"/></svg>.json</button>
+        <button class="btn ghost small" id="palClear"><svg class="i"><use href="#i-trash"/></svg>Clear</button>
+      </div>
+    </div>
+    <div class="ed-palette" id="palette"></div>
+    <p class="empty" id="palEmpty"><b>No colours yet</b>Every colour you pick is kept here, in this browser only.</p>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
